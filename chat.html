@@ -23,14 +23,21 @@
 	<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
       var socket = io();
+      // Prompt for user info
+      socket.on('connect', function(){
+        socket.emit('adduser', prompt("Enter your name:"));
+      });
+
+      // Send message to server for parsing
       $('form').submit(function(){
-        socket.emit('chat message', $('#m').val());
+        socket.emit('sendchat', $('#m').val());
         $('#m').val('');
         return false;
       });
 
-      socket.on('chat message', function(msg){
-        $('#messages').append($('<li>').text(msg));
+      // Update chat
+      socket.on('updatechat', function(username, msg){
+        $('#messages').append($('<li>').text(username+': '+msg));
       });
   </script>
   </body>
