@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+  </head>
+      <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      form { background: #ccc; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 1px; width: 90%; margin-right: 50%; }
+      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+    </style>
+  <body>
+  <h1 align='center'>Welcome to Turing Test game!</h1>
+    <ul id="messages"></ul>
+    <form>
+      <!--<input id="m" autocomplete="off" /><button>Send</button>-->
+      <!--<button id="m" type="button" onclick="alert('This is Yes')">Yes</button>-->
+      <!--<button id="m" type="button" onclick="alert('This is No')">No</button>-->
+      <label><input type="radio" name="choice" value="Yes"> Yes</label>
+      <label><input type="radio" name="choice" value="No"> No</label>
+      <input type="button" onclick="ok()" value="choice value">
+    </form>
+    <script src="/socket.io/socket.io.js"> </script>
+	<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+      var socket = io();
+      // Prompt for user info
+      socket.on('connect', function(){
+        socket.emit('adduser', prompt("Enter your name:"));
+      });
+
+      // Send yes/no to server
+      function ok()
+      {
+        var temp = document.getElementsByName("choice");
+        for(i = 0; i < temp.length; i++){
+          if(temp[i].checked){
+            //alert("you choose " + temp[i].value);
+            socket.emit('sendchat', temp[i].value);
+          }
+        }
+      }
+
+      
+      //$('form').submit(function(){
+      //  socket.emit('sendchat', $('#m').val());
+      //  $('#m').val('');
+      //  return false;
+      //});
+
+      // Update chat
+      socket.on('updatechat', function(username, msg){
+        $('#messages').append($('<li>').text(username+': '+msg));
+      });
+  </script>
+  </body>
+</html>

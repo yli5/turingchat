@@ -10,7 +10,13 @@ var botname = 'Alan'; // Make it change randomly?
 var fs = require('fs');
 
 app.get('/', function(req, res){
-	res.sendFile(__dirname + '/chat.html');
+  if(usernames.length % 2 == 0){
+    res.sendFile(__dirname + '/chat.html');  
+  }
+  else{
+    res.sendFile(__dirname + '/chat_yesno.html');
+  }
+	
 });
 
 io.on('connection', function(socket){
@@ -20,7 +26,7 @@ io.on('connection', function(socket){
   socket.on('adduser', function(username){
     socket.username = username;
     // Assign to human chatroom
-    if (Math.random() < 0.5) {
+    if (Math.random() < 0.9) {
       socket.room = 'room' + roomCount.toString();
       usernames.push(socket.username);
       socket.join(socket.room);
