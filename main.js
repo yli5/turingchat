@@ -2,16 +2,22 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-var usernames = [];
-var usersWithBot = [];
-var UserRoomPair = {};
-var roomCount = 0;
+var usernames = [];     // name of users chatting with humans
+var usersWithBot = [];  // name of users chatting with bot
+var UserRoomPair = {};  // store {username: room id} pair
+
+var roomCount = 0;      // number of rooms open
+var roomState = {};     // record the state of room {room id: state}, value is {1,-1}
+                        // 1 means it's time to ask questions, -1 means it's time to answer yes/no
+var UserState = {};     // record the state of user {username: state}, value is {1,-1}
+                        // 1 means this user is asker, -1 means this user is responser
+
 var botname = 'Alan'; // Make it change randomly?
 var fs = require('fs');
 
 app.get('/', function(req, res){
   if(usernames.length % 2 == 0){
-    res.sendFile(__dirname + '/chat.html');  
+    res.sendFile(__dirname + '/chat.html');
   }
   else{
     res.sendFile(__dirname + '/chat_yesno.html');
@@ -30,8 +36,13 @@ io.on('connection', function(socket){
       socket.room = 'room' + roomCount.toString();
       usernames.push(socket.username);
       socket.join(socket.room);
-      UserRoomPair[socket.username] = socket.room;
+      UserRoomPair[socket.username] = socket.room;    //update UserRoomPair
+      
+      UserState[socket.username] = 1;   // initial all users' state as 1
+      roomState[socket.room] = 1;       // initial roomState as 1, namely it's time to ask questions
+
       if (usernames.length % 2 == 0){
+        UserState[socket.username] = -1;    // if it is a responser, state changes to -1
         roomCount++;
       }
     }
@@ -41,6 +52,8 @@ io.on('connection', function(socket){
       usersWithBot.push(socket.username);
       socket.join(socket.room);
       UserRoomPair[socket.username] = socket.room;
+      
+      UserState[socket.username] = 1;     // for users in botroom, they are always askers.
     }
     console.log(socket.username + ' has joined ' + socket.room);
     console.log(usernames);
@@ -50,7 +63,11 @@ io.on('connection', function(socket){
 		
   // broadcast new message
 	socket.on('sendchat', function(msg){
-		io.sockets.in(socket.room).emit('updatechat', socket.username, msg);
+    if(roomState[socket.room] == UserState[socket.username]){     // can broadcast message only userstate matches roomstate
+		  io.sockets.in(socket.room).emit('updatechat', socket.username, msg);
+      roomState[socket.room] *= -1;   // after broadcasting, change roomstate
+    }
+
     fs.appendFile("test.log", msg+'\n', function(err){
       if (err) {
         return console.log(err)
