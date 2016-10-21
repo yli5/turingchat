@@ -7,6 +7,7 @@ var usersWithBot = [];
 var UserRoomPair = {};
 var roomCount = 0;
 var botname = 'Alan'; // Make it change randomly?
+var fs = require('fs');
 
 app.get('/', function(req, res){
 	res.sendFile(__dirname + '/chat.html');
@@ -44,6 +45,11 @@ io.on('connection', function(socket){
   // broadcast new message
 	socket.on('sendchat', function(msg){
 		io.sockets.in(socket.room).emit('updatechat', socket.username, msg);
+    fs.appendFile("test.log", msg+'\n', function(err){
+      if (err) {
+        return console.log(err)
+      }
+    });
     // If user is in a bot room, bot responds
     if (usernames.indexOf(socket.username) == -1) {
       if (Math.random() < 0.5) {
