@@ -11,6 +11,7 @@ var roomState = {};     // record the state of room {room id: state}, value is {
                         // 1 means it's time to ask questions, -1 means it's time to answer yes/no
 var UserState = {};     // record the state of user {username: state}, value is {1,-1}
                         // 1 means this user is asker, -1 means this user is responser
+var numMsg = {};        // number of messages each user has sent out
 
 var botname = 'Alan'; // Make it change randomly?
 var fs = require('fs');
@@ -31,6 +32,7 @@ io.on('connection', function(socket){
 	// listen for a new user:
   socket.on('adduser', function(username){
     socket.username = username;
+    numMsg[socket.username] = 0;
     // Assign to human chatroom
     if (Math.random() < 0.9) {
       socket.room = 'room' + roomCount.toString();
@@ -66,13 +68,14 @@ io.on('connection', function(socket){
     if(roomState[socket.room] == UserState[socket.username]){     // can broadcast message only userstate matches roomstate
 		  io.sockets.in(socket.room).emit('updatechat', socket.username, msg);
       roomState[socket.room] *= -1;   // after broadcasting, change roomstate
-    }
+      numMsg[socket.username] += 1;
 
-    fs.appendFile("test.log", msg+'\n', function(err){
-      if (err) {
-        return console.log(err)
-      }
-    });
+      fs.appendFile("test.log", '['+socket.room.toString()+':'+numMsg[socket.username]+'] '+msg+'\n', function(err){
+        if (err) {
+          return console.log(err)
+        }
+      });
+    }
     // If user is in a bot room, bot responds
     if (usernames.indexOf(socket.username) == -1) {
       if (Math.random() < 0.5) {
