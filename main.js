@@ -42,7 +42,7 @@ io.on('connection', function(socket){
     socket.username = username;
     numMsg[socket.username] = 0;
     // Assign to human chatroom
-    if (Math.random() < 0.9) {
+    if (Math.random() < 1.2) {
       socket.room = 'room' + roomCount.toString();
       usernames.push(socket.username);
       socket.join(socket.room);
