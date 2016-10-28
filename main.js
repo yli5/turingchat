@@ -1,6 +1,10 @@
-var app = require('express')();
+//var app = require('express')();
+var express= require('express'); 
+var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+
+
 
 var usernames = [];     // name of users chatting with humans
 var usersWithBot = [];  // name of users chatting with bot
@@ -16,6 +20,8 @@ var numMsg = {};        // number of messages each user has sent out
 var botname = 'Alan'; // Make it change randomly?
 var fs = require('fs');
 
+
+
 app.get('/', function(req, res){
   if(usernames.length % 2 == 0){
     res.sendFile(__dirname + '/chat.html');
@@ -25,6 +31,8 @@ app.get('/', function(req, res){
   }
 	
 });
+
+
 
 io.on('connection', function(socket){
 	console.log('a user connected');
@@ -106,6 +114,14 @@ io.on('connection', function(socket){
     console.log(socket.username+' disconnected');
   });
 });
+
+
+
+// express setup
+app.use(express.static(__dirname + '/public'));
+
+
+
 
 
 http.listen(3000, function(){
