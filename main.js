@@ -3,8 +3,7 @@ var express= require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-
-
+app.use(express.static(__dirname + '/public'));
 
 var usernames = [];     // name of users chatting with humans
 var usersWithBot = [];  // name of users chatting with bot
@@ -24,12 +23,11 @@ var fs = require('fs');
 
 app.get('/', function(req, res){
   if(usernames.length % 2 == 0){
-    res.sendFile(__dirname + '/chat.html');
+    res.sendFile(__dirname + '/views/chat.html');
   }
   else{
-    res.sendFile(__dirname + '/chat_yesno.html');
+    res.sendFile(__dirname + '/views/chat_yesno.html');
   }
-	
 });
 
 
@@ -39,6 +37,7 @@ io.on('connection', function(socket){
 
 	// listen for a new user:
   socket.on('adduser', function(username){
+
     socket.username = username;
     numMsg[socket.username] = 0;
     // Assign to human chatroom
@@ -99,13 +98,13 @@ io.on('connection', function(socket){
   // disconnect
   socket.on('disconnect', function(){
     usrIdx = usernames.indexOf(socket.username)
-    if (usrIdx != -1) {
+    if (usrIdx != -1) { // User is in human chat 
       usernames.splice(usrIdx, 1);
       if (usernames.length % 2 != 0) {
         roomCount--;
       }
     }
-    else {
+    else { // User is in bot chat
       usersWithBot.splice(usersWithBot.indexOf(socket.username));
     }
     delete UserRoomPair[socket.username];
@@ -119,9 +118,6 @@ io.on('connection', function(socket){
 
 // express setup
 app.use(express.static(__dirname + '/public'));
-
-
-
 
 
 http.listen(3000, function(){

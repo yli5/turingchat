@@ -2,41 +2,61 @@
 <html>
   <head>
     <title>Socket.IO chat</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
   </head>
       <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font: 13px Helvetica, Arial; }
-      form { background: #ccc; padding: 50px; position: fixed; bottom: 0; width: 100%; }
+      form { background: #666; padding: 50px; position: fixed; bottom: 0; width: 100%;}
       form button { width: 90%; background: rgb(130, 224, 255); border: none; padding: 100px; }
       #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages li { padding: 5px 10px; }
+      #messages li { padding: 5px 10px; font-size:30px;}
       #messages li:nth-child(odd) { background: #eee; }
     </style>
   <body>
   <h1 align='center'>Welcome to Turing Test game!</h1>
     <ul id="messages"></ul>
-    <form>
+    <form align='center'>
+      <div class="yesno-selector">
+        <input id="yes" type="radio" name="choice" value="Yes"/>
+        <label class="drinkcard-cc yes" for="yes"></label>
+        <input type="button" onclick="ok()" value="submit">
+        <input id="no" type="radio" name="choice" value="No"/>
+        <label class="drinkcard-cc no" for="no"></label>
+      </div>
+      <!--
+      <div id="radio">
+        <label><input type="radio" name="choice" value="Yes" style="margin-left:150px; margin-top:0px">
+          <img src="../public/yes_logo.gif" width="80" height="50" value="Yes" style="margin-left:0px; margin-top:0px">
+        </label>
 
-      <label><input type="radio" name="choice" value="Yes" style="margin-left:150px; margin-top:0px">
-      <img src="/yes_logo.gif" width="80" height="50" value="Yes" style="margin-left:0px; margin-top:0px">
-      </label>
+        <input type="button" onclick="ok()" value="submit" style="margin-left:150px; margin-top:0px; height:1000px; width:200px">
 
-      <input type="button" onclick="ok()" value="submit" style="margin-left:150px; margin-top:0px; height:1000px; width:200px">
-
-      <label><input type="radio" name="choice" value="No" style="margin-left:150px; margin-top:0px">
-      <img src="/no_logo.gif" width="80" height="50" value="No" style="margin-left:0px; margin-top:0px">
-      </label>
+        <label><input type="radio" name="choice" value="No" style="margin-left:150px; margin-top:0px">
+          <img src="../public/no_logo.gif" width="80" height="50" value="No" style="margin-left:0px; margin-top:0px">
+        </label>
+      </div>
+      -->
       <!--<label><input type="image" name="choice" src="yes_logo.gif" width="80" height="50" value="Yes" style="margin-left:200px; margin-top:0px"></label>-->
       
       <!--<label><input type="image" name="choice" src="no_logo.gif" width="80" height="50" value="No" style="margin-left:150px; margin-top:0px"></label>-->
     </form>
-    <script src="/socket.io/socket.io.js"> </script>
+  <script src="/socket.io/socket.io.js"> </script>
+  <script>
+    $(function() {
+      $('#radio').buttonset();
+    });
+  </script>
 	<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
       var socket = io();
       // Prompt for user info
       socket.on('connect', function(){
-        socket.emit('adduser', prompt("Enter your name:"));
+        var username;
+        do{
+          username = prompt("Enter your name:");
+        }while(!username);
+        socket.emit('adduser', username);
       });
 
       // Send yes/no to server
@@ -50,7 +70,6 @@
           }
         }
       }
-
       
       //$('form').submit(function(){
       //  socket.emit('sendchat', $('#m').val());

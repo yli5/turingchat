@@ -1,0 +1,38 @@
+.yesno-selector input{
+    margin:0;padding:0;
+    -webkit-appearance:none;
+       -moz-appearance:none;
+            appearance:none;
+}
+.yes{background-image:url('../images/yes.png');}
+.no{background-image:url('../images/no.png');}
+
+.yesno-selector input:active +.drinkcard-cc{opacity: .9;}
+.yesno-selector input:checked +.drinkcard-cc{
+    -webkit-filter: none;
+       -moz-filter: none;
+            filter: none;
+}
+.drinkcard-cc{
+    cursor:pointer;
+    background-size:contain;
+    background-repeat:no-repeat;
+    display:inline-block;
+    width:100px;height:70px;
+    -webkit-transition: all 100ms ease-in;
+       -moz-transition: all 100ms ease-in;
+            transition: all 100ms ease-in;
+    -webkit-filter: brightness(1) grayscale(.3) opacity(.8);
+       -moz-filter: brightness(1) grayscale(.3) opacity(.8);
+            filter: brightness(1) grayscale(.3) opacity(.8);
+}
+.drinkcard-cc:hover {
+    -webkit-filter: brightness(1) grayscale(.2) opacity(.9);
+       -moz-filter: brightness(1) grayscale(.2) opacity(.9);
+            filter: brightness(1) grayscale(.2) opacity(.9);
+}
+
+/* Extras */
+a:visited {color:#888}
+a{color:#444;text-decoration:none;}
+p{margin-bottom:.3em;}
