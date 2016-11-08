@@ -8,6 +8,8 @@ var usernames = [];     // name of users chatting with humans
 var usersWithBot = [];  // name of users chatting with bot
 var UserRoomPair = {};  // store {username: room id} pair
 
+var RoomUserMap = require('node-hashtable');  // store {room id: user socket} pair
+
 var roomCount = 0;      // number of rooms open
 var roomState = {};     // record the state of room {room id: state}, value is {1,-1}
                         // 1 means it's time to ask questions, -1 means it's time to answer yes/no
@@ -46,6 +48,7 @@ io.on('connection', function(socket){
       usernames.push(socket.username);
       socket.join(socket.room);
       UserRoomPair[socket.username] = socket.room;    //update UserRoomPair
+      RoomUserMap.add(socket.room, socket)
       
       UserState[socket.username] = 1;   // initial all users' state as 1
       roomState[socket.room] = 1;       // initial roomState as 1, namely it's time to ask questions
@@ -62,6 +65,7 @@ io.on('connection', function(socket){
       usersWithBot.push(socket.username);
       socket.join(socket.room);
       UserRoomPair[socket.username] = socket.room;
+      RoomUserMap.add(socket.room, socket)
       
       UserState[socket.username] = 1;     // for users in botroom, they are always askers.
     }
@@ -118,16 +122,31 @@ io.on('connection', function(socket){
     else { // User is in bot chat
       usersWithBot.splice(usersWithBot.indexOf(socket.username));
     }
+
+    
+
+    // delete partners in the same room
+    var room_id_delete = UserRoomPair[socket.username]
+    console.log('room to delete is:' + room_id_delete)
+    if(RoomUserMap.get(room_id_delete).length > 0){
+      RoomUserMap.get(room_id_delete).forEach(function (arrayItem){
+        if(arrayItem.id != socket.id){
+          io.sockets.in(socket.room).emit('updatechat','SERVER','Your partner has disconnected');
+          io.sockets.in(socket.room).emit('updatechat', 'SERVER', 'You\'ll be disconnected, please refresh to enter a new room.');
+        }
+        arrayItem.disconnect();
+        console.log(UserRoomPair);
+      })
+      RoomUserMap.delete(room_id_delete);
+    }
+
+
+    // delete user's infomation
     delete UserRoomPair[socket.username];
-    io.sockets.in(socket.room).emit('updatechat', 'SERVER', socket.username+' has disconnected');
-    io.sockets.in(socket.room).emit('updatechat', 'SERVER', 'You\'ll be disconnected, please refresh to enter a new room.');
 
     socket.leave(socket.room);
     console.log(socket.username+' disconnected');
-    //io.of('/').in(socket.room).clients.forEach(function(s){
-    //    s.leave(socket.room);
-    //    console.log(s.username+' disconnected');
-    //});
+    
   });
 });
 
