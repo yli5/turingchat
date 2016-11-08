@@ -1,4 +1,3 @@
-//var app = require('express')();
 var express= require('express'); 
 var app = express();
 var http = require('http').Server(app);
@@ -40,12 +39,14 @@ io.on('connection', function(socket){
 
     socket.username = username;
     numMsg[socket.username] = 0;
+    var botroom = false;
     // Assign to human chatroom
     if (Math.random() < 1.2) {
       socket.room = 'room' + roomCount.toString();
       usernames.push(socket.username);
       socket.join(socket.room);
       UserRoomPair[socket.username] = socket.room;    //update UserRoomPair
+      nameIDPair[socket.username] = socket.id;
       
       UserState[socket.username] = 1;   // initial all users' state as 1
       roomState[socket.room] = 1;       // initial roomState as 1, namely it's time to ask questions
@@ -57,12 +58,20 @@ io.on('connection', function(socket){
     }
     // Assign to bot chatroom
     else {
+      botroom = true;
       socket.room = 'botroom' + usersWithBot.length.toString();
       usersWithBot.push(socket.username);
       socket.join(socket.room);
       UserRoomPair[socket.username] = socket.room;
       
       UserState[socket.username] = 1;     // for users in botroom, they are always askers.
+    }
+    io.sockets.in(socket.room).emit('updatechat', 'SERVER', socket.username+' has joined the room!');
+    if (io.sockets.adapter.rooms[socket.room].length == 1 && !botroom){
+      io.sockets.in(socket.room).emit('updatechat', 'SERVER', 'You\'re the first person in this room, wait for another participant to begin.');
+    }
+    else {
+      io.sockets.in(socket.room).emit('updatechat', 'SERVER', 'Let\'s begin! Ask a question!');
     }
     console.log(socket.username + ' has joined ' + socket.room);
     console.log(usernames);
@@ -72,7 +81,10 @@ io.on('connection', function(socket){
 		
   // broadcast new message
 	socket.on('sendchat', function(msg){
-    if(roomState[socket.room] == UserState[socket.username]){     // can broadcast message only userstate matches roomstate
+    // can broadcast message only userstate matches roomstate
+    // and there are 2 people in the room.
+    if(roomState[socket.room] == UserState[socket.username] &&
+       io.sockets.adapter.rooms[socket.room].length == 2){
 		  io.sockets.in(socket.room).emit('updatechat', socket.username, msg);
       roomState[socket.room] *= -1;   // after broadcasting, change roomstate
       numMsg[socket.username] += 1;
@@ -108,9 +120,15 @@ io.on('connection', function(socket){
       usersWithBot.splice(usersWithBot.indexOf(socket.username));
     }
     delete UserRoomPair[socket.username];
+    io.sockets.in(socket.room).emit('updatechat', 'SERVER', socket.username+' has disconnected');
+    io.sockets.in(socket.room).emit('updatechat', 'SERVER', 'You\'ll be disconnected, please refresh to enter a new room.');
+
     socket.leave(socket.room);
-    socket.emit('chat message', 'SERVER', socket.username+' has disconnected');
     console.log(socket.username+' disconnected');
+    //io.of('/').in(socket.room).clients.forEach(function(s){
+    //    s.leave(socket.room);
+    //    console.log(s.username+' disconnected');
+    //});
   });
 });
 
