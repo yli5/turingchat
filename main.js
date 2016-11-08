@@ -46,7 +46,6 @@ io.on('connection', function(socket){
       usernames.push(socket.username);
       socket.join(socket.room);
       UserRoomPair[socket.username] = socket.room;    //update UserRoomPair
-      nameIDPair[socket.username] = socket.id;
       
       UserState[socket.username] = 1;   // initial all users' state as 1
       roomState[socket.room] = 1;       // initial roomState as 1, namely it's time to ask questions
