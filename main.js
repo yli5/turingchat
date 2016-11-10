@@ -128,7 +128,7 @@ io.on('connection', function(socket){
     // delete partners in the same room
     var room_id_delete = UserRoomPair[socket.username]
     console.log('room to delete is:' + room_id_delete)
-    if(RoomUserMap.get(room_id_delete).length > 0){
+    if(RoomUserMap.get(room_id_delete) != null){
       RoomUserMap.get(room_id_delete).forEach(function (arrayItem){
         if(arrayItem.id != socket.id){
           io.sockets.in(socket.room).emit('updatechat','SERVER','Your partner has disconnected');
