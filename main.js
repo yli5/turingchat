@@ -74,7 +74,7 @@ io.on('connection', function(socket){
       UserState[socket.username] = 1;     // for users in botroom, they are always askers.
     }
 
-
+    // print out ID, and welcome information
     io.sockets.in(socket.room).emit('updatechat', 'SERVER', socket.username+' has joined the room!');
     if (io.sockets.adapter.rooms[socket.room].length == 1 && !botroom){
       // send unique id for the asker
@@ -97,13 +97,18 @@ io.on('connection', function(socket){
     console.log('Asker ID goes to: Q'+AskerID);
     console.log('Answer ID goes to: A'+AnswerID);
   });
+
+
+
 		
   // broadcast new message
 	socket.on('sendchat', function(msg){
     // can broadcast message only userstate matches roomstate
     // and there are 2 people in the room.
+    var msg_split = msg.split(" ");
+
     if(roomState[socket.room] == UserState[socket.username] &&
-       io.sockets.adapter.rooms[socket.room].length == 2){
+       io.sockets.adapter.rooms[socket.room].length == 2 && msg_split.length<10){
 		  io.sockets.in(socket.room).emit('updatechat', socket.username, msg);
       roomState[socket.room] *= -1;   // after broadcasting, change roomstate
       numMsg[socket.username] += 1;
@@ -114,6 +119,8 @@ io.on('connection', function(socket){
         }
       });
     }
+
+    
     // If user is in a bot room, bot responds
     if (usernames.indexOf(socket.username) == -1) {
       if (Math.random() < 0.5) {
