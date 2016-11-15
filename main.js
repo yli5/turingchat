@@ -23,6 +23,8 @@ var fs = require('fs');
 var AskerID = 1000;
 var AnswerID = 1000;
 
+var UserIDPair = {};
+
 
 
 app.get('/', function(req, res){
@@ -79,6 +81,7 @@ io.on('connection', function(socket){
     if (io.sockets.adapter.rooms[socket.room].length == 1 && !botroom){
       // send unique id for the asker
       socket.emit('updatechat','SERVER', 'Your ID is:Q'+AskerID);
+      UserIDPair[socket.username] = 'Q'+AskerID;
       AskerID = AskerID + 1;
 
       io.sockets.in(socket.room).emit('updatechat', 'SERVER', 'You\'re the first person in this room, wait for another participant to begin.');
@@ -86,6 +89,7 @@ io.on('connection', function(socket){
     else {
       // send unique id for the answer
       socket.emit('updatechat','SERVER', 'Your ID is:A'+AnswerID);
+      UserIDPair[socket.username] = 'A'+AnswerID;
       AnswerID = AnswerID + 1;
       
       io.sockets.in(socket.room).emit('updatechat', 'SERVER', 'Let\'s begin! Ask a question!');
@@ -113,7 +117,7 @@ io.on('connection', function(socket){
       roomState[socket.room] *= -1;   // after broadcasting, change roomstate
       numMsg[socket.username] += 1;
 
-      fs.appendFile("test.log", '['+socket.room.toString()+':'+numMsg[socket.username]+'] '+msg+'\n', function(err){
+      fs.appendFile("test.log", '['+socket.room.toString()+':'+UserIDPair[socket.username]+":"+numMsg[socket.username]+'] '+msg+'\n', function(err){
         if (err) {
           return console.log(err)
         }

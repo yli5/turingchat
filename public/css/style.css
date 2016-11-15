@@ -4,8 +4,8 @@
        -moz-appearance:none;
             appearance:none;
 }
-.yes{background-image:url('../images/yes.png');}
-.no{background-image:url('../images/no.png');}
+.yes{background-image:url('../images/yes.ico');}
+.no{background-image:url('../images/no.ico');}
 
 .yesno-selector input:active +.drinkcard-cc{opacity: .9;}
 .yesno-selector input:checked +.drinkcard-cc{

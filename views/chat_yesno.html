@@ -5,7 +5,7 @@
     <link rel="stylesheet" type="text/css" href="css/style.css">
       <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font: 13px Helvetica, Arial; }
+      body { font: 22px Helvetica, Arial; }
       form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%;}
       form button { width: 90%; background: rgb(130, 224, 255); border: none; padding: 100px; }
       #messages { list-style-type: none; margin: 0; padding: 100px; }
@@ -18,28 +18,11 @@
     <ul id="messages"></ul>
     <form align='center'>
       <div class="yesno-selector">
-        <input id="yes" type="radio" name="choice" value="Yes"/>
+        <input onCLick="ok();" id="yes" type="radio" name="choice" value="Yes"/>
         <label class="drinkcard-cc yes" for="yes"></label>
-        <input type="button" onclick="ok()" value="submit">
-        <input id="no" type="radio" name="choice" value="No"/>
+        <input onClick="ok();" id="no" type="radio" name="choice" value="No"/>
         <label class="drinkcard-cc no" for="no"></label>
       </div>
-      <!--
-      <div id="radio">
-        <label><input type="radio" name="choice" value="Yes" style="margin-left:150px; margin-top:0px">
-          <img src="../public/yes_logo.gif" width="80" height="50" value="Yes" style="margin-left:0px; margin-top:0px">
-        </label>
-
-        <input type="button" onclick="ok()" value="submit" style="margin-left:150px; margin-top:0px; height:1000px; width:200px">
-
-        <label><input type="radio" name="choice" value="No" style="margin-left:150px; margin-top:0px">
-          <img src="../public/no_logo.gif" width="80" height="50" value="No" style="margin-left:0px; margin-top:0px">
-        </label>
-      </div>
-      -->
-      <!--<label><input type="image" name="choice" src="yes_logo.gif" width="80" height="50" value="Yes" style="margin-left:200px; margin-top:0px"></label>-->
-      
-      <!--<label><input type="image" name="choice" src="no_logo.gif" width="80" height="50" value="No" style="margin-left:150px; margin-top:0px"></label>-->
     </form>
   <script src="/socket.io/socket.io.js"> </script>
   <script>
