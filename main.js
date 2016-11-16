@@ -22,7 +22,6 @@ var fs = require('fs');
 
 var AskerID = 1000;
 var AnswerID = 1000;
-
 var UserIDPair = {};
 
 
@@ -117,7 +116,17 @@ io.on('connection', function(socket){
       roomState[socket.room] *= -1;   // after broadcasting, change roomstate
       numMsg[socket.username] += 1;
 
-      fs.appendFile("test.log", '['+socket.room.toString()+':'+UserIDPair[socket.username]+":"+numMsg[socket.username]+'] '+msg+'\n', function(err){
+      var timestamp = Math.round(new Date().getTime()/1000);
+      var date = new Date(timestamp*1000);
+      var time = date.toLocaleString();
+      /*var month = date.getMonth();
+      var day = date.getDate();
+      var hour = date.getHours();
+      var min = date.getMinutes();
+      var sec = date.getSeconds();
+      var time = month + ' ' + day + ' ' + hour + ':' + min + ':' + sec;*/
+
+      fs.appendFile("test.log", '['+time+':'+socket.room.toString()+':'+UserIDPair[socket.username]+":"+numMsg[socket.username]+'] '+msg+'\n', function(err){
         if (err) {
           return console.log(err)
         }
