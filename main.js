@@ -79,17 +79,19 @@ io.on('connection', function(socket){
     io.sockets.in(socket.room).emit('updatechat', 'SERVER', socket.username+' has joined the room!');
     if (io.sockets.adapter.rooms[socket.room].length == 1 && !botroom){
       // send unique id for the asker
+      AskerID = AskerID + 1;
       socket.emit('updatechat','SERVER', 'Your ID is:Q'+AskerID);
       UserIDPair[socket.username] = 'Q'+AskerID;
-      AskerID = AskerID + 1;
+      
 
       io.sockets.in(socket.room).emit('updatechat', 'SERVER', 'You\'re the first person in this room, wait for another participant to begin.');
     }
     else {
       // send unique id for the answer
+      AnswerID = AnswerID + 1;
       socket.emit('updatechat','SERVER', 'Your ID is:A'+AnswerID);
       UserIDPair[socket.username] = 'A'+AnswerID;
-      AnswerID = AnswerID + 1;
+      
       
       io.sockets.in(socket.room).emit('updatechat', 'SERVER', 'Let\'s begin! Ask a question!');
     }
